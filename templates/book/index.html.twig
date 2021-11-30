@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}The Library
+{% endblock %}
+
+{% block body %}
+	<style>
+		.example-wrapper {
+			margin: 1em auto;
+			max-width: 800px;
+			width: 95%;
+			font: 18px / 1.5 sans-serif;
+		}
+		.example-wrapper code {
+			background: #F5F5F5;
+			padding: 2px 6px;
+		}
+	</style>
+
+	<div class="example-wrapper">
+		<h2 class="text center">Our Books</h2>
+		<div class="container">
+			<ul>
+				{% for item in items %}
+					<li>Name:
+						{{item.name}}, Author:
+						{{item.author}}, Description:
+						{{item.description}}, published:
+						{{item.pubDate|date('F j, Y')}}, price:
+
+						{{item.price}}, picture path:
+						{{item.picture}}
+						<a href="/details/{{item.id}}" class="btn btn-info">Details</a>
+						<a href="/edit/{{item.id}}" class="btn btn-success">Edit</a>
+						<a href="/delete/{{item.id}}" class="btn btn-danger">Delete</a>
+					</li>
+
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+{% endblock %}

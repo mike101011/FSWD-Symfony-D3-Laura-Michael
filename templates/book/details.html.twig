@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<div class="container">
+		<hr>
+
+		<h2 class="page-header">{{item.name}}</h2>
+
+		<ul class="list-group">
+
+			<li class="list-group-item">Author:
+				{{item.author}}</li>
+
+			<li class="list-group-item">Published:
+				<strong>
+					{{item.pubDate|date('F j, Y')}}
+				</strong>
+			</li>
+			<li class="list-group-item">Price:
+				{{item.price}}</li>
+			<li class="list-group-item">Picture:
+				{{item.picture}}</li>
+
+
+		</ul>
+		<h5>Description</h5>
+
+		<p>
+
+			{{item.description}}
+
+		</p><br>
+
+		<a class="btn btn-warning" href="/">Back Home</a>
+	</div>
+{% endblock %}
