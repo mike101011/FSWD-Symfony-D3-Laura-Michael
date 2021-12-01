@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Items;
-use Doctrine\DBAL\Types\DecimalType;
+use App\Entity\Status;
+use App\Service\FileUploader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
@@ -15,6 +17,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Validator\Constraints\File;
+
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 
@@ -29,7 +34,7 @@ class BookController extends AbstractController
         ]);
     }
     #[Route('/create', name: 'create')]
-    public function create(Request $request): Response
+    public function create(Request $request, FileUploader $fileUploader): Response
     {
         // Here we create an object from the class that we made
 
@@ -46,11 +51,41 @@ class BookController extends AbstractController
             ->add('pub_date', DateType::class, array('attr' => array('class' => 'form-control', 'style' => 'margin-bottom:15px')))
             ->add('price', NumberType::class, array('attr' => array('class' => 'form-control', 'style' => 'margin-bottom:15px')))
 
-            ->add('picture', TextType::class, array('attr' => array('class' => 'form-control', 'style' => 'margin-botton:15px')))
+            ->add('pictureUrl', FileType::class, [
+                'label' => 'Upload Picture',
+                //unmapped means that is not associated to any entity property
+                'mapped' => false,
+                //not mandatory to have a file
+                'required' => false,
 
 
+                //in the associated entity, so you can use the PHP constraint classes as validators
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'image/png',
+                            'image/jpeg',
+                            'image/jpg',
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid image file',
+                    ])
+                ],
+                'attr' => array('class' => 'form-control', 'style' => 'margin-botton:15px')
+            ])
 
-            ->add('save', SubmitType::class, array('label' => 'Create Items', 'attr' => array('class' => 'btn-primary', 'style' => 'margin-bottom:15px')))
+            /*->add('picture', TextType::class, array('attr' => array('class' => 'form-control', 'style' => 'margin-botton:15px')))*/
+
+            ->add('fk_status', EntityType::class, [
+
+                'class' => Status::class,
+
+                'choice_label' => 's_condition',
+
+                'attr' => array('class' => 'form-control', 'style' => 'margin-botton:15px')
+            ])
+
+            ->add('save', SubmitType::class, array('label' => 'Add Item', 'attr' => array('class' => 'btn-primary', 'style' => 'margin-top:15px')))
 
             ->getForm();
 
@@ -77,7 +112,9 @@ class BookController extends AbstractController
             $pub_date = $form['pub_date']->getData();
 
             $price = $form['price']->getData();
-            $picture = $form['picture']->getData();
+            $pictureFile = $form->get('pictureUrl')->getData();
+            $pictureFileName = $fileUploader->upload($pictureFile);
+
 
 
 
@@ -97,7 +134,7 @@ class BookController extends AbstractController
 
 
 
-            $item->setPicture($picture);
+            $item->setPicture($pictureFileName);
 
             $em = $this->getDoctrine()->getManager();
 
@@ -127,7 +164,7 @@ class BookController extends AbstractController
         return $this->render('book/details.html.twig', array('item' => $item));
     }
     #[Route('/edit/{id}', name: 'edit')]
-    public function edit(Request $request, $id)
+    public function edit(Request $request, $id, FileUploader $fileUploader)
     {
         $item = $this->getDoctrine()->getRepository(Items::class)->find($id);
 
@@ -142,11 +179,39 @@ class BookController extends AbstractController
             ->add('pub_date', DateType::class, array('attr' => array('class' => 'form-control', 'style' => 'margin-bottom:15px')))
             ->add('price', NumberType::class, array('attr' => array('class' => 'form-control', 'style' => 'margin-bottom:15px')))
 
-            ->add('picture', TextType::class, array('attr' => array('class' => 'form-control', 'style' => 'margin-botton:15px')))
+            ->add('picture', FileType::class, [
+                'label' => 'Upload Picture',
+                //unmapped means that is not associated to any entity property
+                'mapped' => false,
+                //not mandatory to have a file
+                'required' => false,
 
 
+                //in the associated entity, so you can use the PHP constraint classes as validators
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'image/png',
+                            'image/jpeg',
+                            'image/jpg',
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid image file',
+                    ])
+                ],
+                'attr' => array('class' => 'form-control', 'style' => 'margin-botton:15px')
+            ])
 
-            ->add('save', SubmitType::class, array('label' => 'Create Items', 'attr' => array('class' => 'btn-primary', 'style' => 'margin-bottom:15px')))
+            ->add('fk_status', EntityType::class, [
+
+                'class' => Status::class,
+
+                'choice_label' => 's_condition',
+
+                'attr' => array('class' => 'form-control', 'style' => 'margin-botton:15px')
+            ])
+
+            ->add('save', SubmitType::class, array('label' => 'Add Item', 'attr' => array('class' => 'btn-primary', 'style' => 'margin-top:15px')))
 
             ->getForm();
 
@@ -173,7 +238,8 @@ class BookController extends AbstractController
             $pub_date = $form['pub_date']->getData();
 
             $price = $form['price']->getData();
-            $picture = $form['picture']->getData();
+            $pictureFile = $form->get('picture')->getData();
+            $pictureFileName = $fileUploader->upload($pictureFile);
 
 
 
@@ -193,7 +259,7 @@ class BookController extends AbstractController
 
 
 
-            $item->setPicture($picture);
+            $item->setPicture($pictureFileName);
 
             $em = $this->getDoctrine()->getManager();
 

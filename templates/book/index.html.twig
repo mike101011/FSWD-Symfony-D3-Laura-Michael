@@ -4,39 +4,30 @@
 {% endblock %}
 
 {% block body %}
-	<style>
-		.example-wrapper {
-			margin: 1em auto;
-			max-width: 800px;
-			width: 95%;
-			font: 18px / 1.5 sans-serif;
-		}
-		.example-wrapper code {
-			background: #F5F5F5;
-			padding: 2px 6px;
-		}
-	</style>
-
 	<div class="example-wrapper">
 		<h2 class="text center">Our Books</h2>
 		<div class="container">
-			<ul>
+			<div class="row">
 				{% for item in items %}
-					<li>Name:
-						{{item.name}}, Author:
-						{{item.author}}, Description:
-						{{item.description}}, published:
-						{{item.pubDate|date('F j, Y')}}, price:
+					<div class="col-12 col-md-6 col-lg-3">
+						<div class="card" style="width: 18rem;">
+							<img src="{{ asset( 'img/' ~ item.picture) }}" class="card-img-top" alt="Error">
 
-						{{item.price}}, picture path:
-						{{item.picture}}
-						<a href="/details/{{item.id}}" class="btn btn-info">Details</a>
-						<a href="/edit/{{item.id}}" class="btn btn-success">Edit</a>
-						<a href="/delete/{{item.id}}" class="btn btn-danger">Delete</a>
-					</li>
+							<div class="card-body">
+								<h5 class="card-title">Title:
+									{{item.name}}</h5>
+								<h6>Author:
+									{{item.author}}</h6>
+								<p class="card-text">{{item.description}}</p>
+								<a href="/details/{{item.id}}" class="btn btn-info">Details</a>
+								<a href="/edit/{{item.id}}" class="btn btn-success">Edit</a>
+								<a href="/delete/{{item.id}}" class="btn btn-danger">Delete</a>
 
+							</div>
+						</div>
+					</div>
 				{% endfor %}
-			</ul>
+
+			</div>
 		</div>
-	</div>
-{% endblock %}
+	{% endblock %}
