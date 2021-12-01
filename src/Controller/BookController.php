@@ -239,7 +239,7 @@ class BookController extends AbstractController
 
             $price = $form['price']->getData();
             $pictureFile = $form->get('picture')->getData();
-            $pictureFileName = $fileUploader->upload($pictureFile);
+            //$pictureFileName = $fileUploader->upload($pictureFile);
 
 
 
@@ -258,8 +258,11 @@ class BookController extends AbstractController
             $item->setPrice($price);
 
 
+            if ($pictureFile) { //make sure that old picture is kept if no new picture chosen
+                $pictureFileName = $fileUploader->upload($pictureFile);
+                $item->setPicture($pictureFileName);
+            }
 
-            $item->setPicture($pictureFileName);
 
             $em = $this->getDoctrine()->getManager();
 
